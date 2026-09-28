@@ -1,0 +1,45 @@
+services:
+  app:
+    build: .
+    image: lbs-kg-service:1.0.0
+    environment:
+      PORT: "3000"
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+    ports:
+      - "127.0.0.1:8080:3000"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - application
+      - ingress
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "src/healthcheck.js"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  redis:
+    image: redis:7.4.2-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+    networks:
+      - application
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+networks:
+  application:
+    internal: true
+  ingress:
+
+volumes:
+  redis-data:
