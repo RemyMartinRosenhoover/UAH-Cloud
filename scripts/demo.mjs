@@ -6,7 +6,8 @@ import { fileURLToPath } from "node:url";
 const rootDirectory = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const projectName = "project1-grade-demo";
 const volumeName = projectName + "_redis-data";
-const baseUrl = "http://127.0.0.1:8080";
+const hostPort = process.env.DEMO_HOST_PORT ?? "8081";
+const baseUrl = "http://127.0.0.1:" + hostPort;
 const transcriptPath = resolve(rootDirectory, "docs", "operational-demo.log");
 const transcript = [];
 
@@ -32,6 +33,7 @@ function runDocker(args, options = {}) {
   const result = spawnSync("docker", args, {
     cwd: rootDirectory,
     encoding: "utf8",
+    env: { ...process.env, HOST_PORT: hostPort },
     windowsHide: true
   });
 
@@ -126,13 +128,14 @@ let exitCode = 0;
 try {
   record("Project 1 container operational demonstration");
   record("Compose project: " + projectName);
+  record("Host port: " + hostPort);
 
   runCompose(["down", "-v"], { captureOutput: true });
   runCompose(["up", "--build", "-d"]);
   await waitForHealth();
 
   const running = runCompose(["ps"], { captureOutput: true }).output;
-  assert(running.includes("127.0.0.1:8080->3000/tcp"), "Application host port is not published");
+  assert(running.includes("127.0.0.1:" + hostPort + "->3000/tcp"), "Application host port is not published");
   assert(!running.includes("6379->"), "Redis must not publish port 6379 to the host");
 
   await request("/stats", 200, { conversions: 0 });
@@ -142,6 +145,7 @@ try {
   await request("/convert", 400);
   await request("/convert?lbs=abc", 400);
   await request("/convert?lbs=-5", 422);
+  await request("/convert?lbs=-1e-400", 422);
   await request("/stats", 200, { conversions: 3 });
 
   const identity = runCompose(["exec", "-T", "app", "id"], { captureOutput: true }).output;

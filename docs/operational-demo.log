@@ -1,12 +1,13 @@
 Project 1 container operational demonstration
 Compose project: project1-grade-demo
+Host port: 8081
 $ docker compose --project-name project1-grade-demo down -v
-time="2026-09-27T23:41:12-05:00" level=warning msg="Warning: No resource found to remove for project \"project1-grade-demo\"."
+time="2026-09-28T00:03:12-05:00" level=warning msg="Warning: No resource found to remove for project \"project1-grade-demo\"."
 $ docker compose --project-name project1-grade-demo up --build -d
 PASS: health endpoint is ready
 $ docker compose --project-name project1-grade-demo ps
 NAME                          IMAGE                  COMMAND                  SERVICE   CREATED          STATUS                                     PORTS
-project1-grade-demo-app-1     lbs-kg-service:1.0.0   "docker-entrypoint.s."   app       12 seconds ago   Up Less than a second (health: starting)   127.0.0.1:8080->3000/tcp
+project1-grade-demo-app-1     lbs-kg-service:1.0.0   "docker-entrypoint.s."   app       12 seconds ago   Up Less than a second (health: starting)   127.0.0.1:8081->3000/tcp
 project1-grade-demo-redis-1   redis:7.4.2-alpine     "docker-entrypoint.s."   redis     12 seconds ago   Up 11 seconds (healthy)                    6379/tcp
 GET /stats -> 200 {"conversions":0}
 GET /convert?lbs=0 -> 200 {"lbs":0,"kg":0,"formula":"kg = lbs * 0.45359237"}
@@ -15,6 +16,7 @@ GET /convert?lbs=0.1 -> 200 {"lbs":0.1,"kg":0.045,"formula":"kg = lbs * 0.453592
 GET /convert -> 400 {"error":"lbs is required and must be numeric"}
 GET /convert?lbs=abc -> 400 {"error":"lbs must be numeric"}
 GET /convert?lbs=-5 -> 422 {"error":"lbs must be finite and non-negative"}
+GET /convert?lbs=-1e-400 -> 422 {"error":"lbs must be finite and non-negative"}
 GET /stats -> 200 {"conversions":3}
 $ docker compose --project-name project1-grade-demo exec -T app id
 uid=1000(node) gid=1000(node) groups=1000(node)
@@ -42,8 +44,8 @@ $ docker compose --project-name project1-grade-demo down
  Container project1-grade-demo-redis-1 Stopped
  Container project1-grade-demo-redis-1 Removing
  Container project1-grade-demo-redis-1 Removed
- Network project1-grade-demo_ingress Removing
  Network project1-grade-demo_application Removing
+ Network project1-grade-demo_ingress Removing
  Network project1-grade-demo_application Removed
  Network project1-grade-demo_ingress Removed
 $ docker volume inspect project1-grade-demo_redis-data
@@ -61,13 +63,13 @@ $ docker compose --project-name project1-grade-demo down -v --rmi local
  Container project1-grade-demo-redis-1 Removing
  Container project1-grade-demo-redis-1 Removed
  Image lbs-kg-service:1.0.0 Removing
+ Network project1-grade-demo_ingress Removing
  Volume project1-grade-demo_redis-data Removing
  Network project1-grade-demo_application Removing
- Network project1-grade-demo_ingress Removing
  Volume project1-grade-demo_redis-data Removed
  Image lbs-kg-service:1.0.0 Removed
- Network project1-grade-demo_application Removed
  Network project1-grade-demo_ingress Removed
+ Network project1-grade-demo_application Removed
 $ docker volume inspect project1-grade-demo_redis-data
 PASS: final cleanup removed the named volume
 PASS: complete container operational demonstration.

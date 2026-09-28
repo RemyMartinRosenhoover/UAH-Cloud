@@ -69,6 +69,9 @@ test("implements the required conversion API and counter behavior", async (conte
   const negative = await request(server.baseUrl, "/convert?lbs=-5");
   assert.equal(negative.status, 422);
 
+  const negativeUnderflow = await request(server.baseUrl, "/convert?lbs=-1e-400");
+  assert.equal(negativeUnderflow.status, 422);
+
   const stats = await request(server.baseUrl, "/stats");
   assert.equal(stats.status, 200);
   assert.deepEqual(stats.body, { conversions: 3 });

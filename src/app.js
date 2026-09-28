@@ -12,6 +12,16 @@ function sendJson(response, statusCode, body) {
   response.end(payload);
 }
 
+function isUnderflowedNegative(rawPounds, pounds) {
+  if (!Object.is(pounds, -0)) {
+    return false;
+  }
+
+  // Preserve negative decimal input whose nonzero magnitude underflows to -0 in JavaScript.
+  const mantissa = rawPounds.trim().slice(1).split(/[eE]/, 1)[0];
+  return /[1-9]/.test(mantissa);
+}
+
 function parsePounds(url) {
   const rawPounds = url.searchParams.get("lbs");
 
@@ -24,7 +34,7 @@ function parsePounds(url) {
     return { error: "lbs must be numeric", statusCode: 400 };
   }
 
-  if (!Number.isFinite(pounds) || pounds < 0) {
+  if (!Number.isFinite(pounds) || pounds < 0 || isUnderflowedNegative(rawPounds, pounds)) {
     return { error: "lbs must be finite and non-negative", statusCode: 422 };
   }
 

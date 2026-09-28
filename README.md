@@ -5,6 +5,7 @@ This project runs a pounds-to-kilograms REST API and Redis as two containers. Re
 ## Prerequisites
 
 - Docker Desktop with Docker Compose v2, or Podman with Compose support
+- Node.js 22 or newer with npm for `npm test` and `node scripts/demo.mjs`
 - A shell with `curl.exe` available on Windows
 
 ## Start the application
@@ -16,7 +17,7 @@ docker compose up --build -d
 docker compose ps
 ```
 
-The API is published only to `http://127.0.0.1:8080`. Redis has no published host port.
+The API is published only to `http://127.0.0.1:8080` by default. Redis has no published host port. Set `HOST_PORT` before `docker compose up` to select another host port.
 
 ## Test the API
 
@@ -50,7 +51,7 @@ With Docker Desktop running, execute the automated, clean-room operational demon
 node scripts/demo.mjs
 ```
 
-The script builds and starts an isolated Compose project, verifies every required API case, shows logs and non-root execution, proves Redis persistence across container recreation, removes the named volume, and writes `docs/operational-demo.log`. A successful transcript ends with `PASS: complete container operational demonstration.`
+The script uses isolated Compose resources and host port `8081` by default, so it can run while the regular deployment remains on `8080`. Set `DEMO_HOST_PORT` to override that choice. It verifies every required API case, shows logs and non-root execution, proves Redis persistence across container recreation, removes the named volume, and writes `docs/operational-demo.log`. A successful transcript ends with `PASS: complete container operational demonstration.`
 
 ## Inspect and operate
 
