@@ -42,6 +42,16 @@ curl.exe -i "http://127.0.0.1:8080/stats"
 
 Expected successful conversion values are `0`, `68.039`, and `0.045` kg, respectively. The missing and non-numeric requests return `400`; the negative request returns `422`. Only the three successful conversion requests increase `conversions`.
 
+## Record a complete demonstration
+
+With Docker Desktop running, execute the automated, clean-room operational demonstration:
+
+```powershell
+node scripts/demo.mjs
+```
+
+The script builds and starts an isolated Compose project, verifies every required API case, shows logs and non-root execution, proves Redis persistence across container recreation, removes the named volume, and writes `docs/operational-demo.log`. A successful transcript ends with `PASS: complete container operational demonstration.`
+
 ## Inspect and operate
 
 ```powershell
