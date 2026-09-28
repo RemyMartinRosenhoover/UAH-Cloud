@@ -5,7 +5,7 @@ This project runs a pounds-to-kilograms REST API and Redis as two containers. Re
 ## Prerequisites
 
 - Docker Desktop with Docker Compose v2, or Podman with Compose support
-- Node.js 22 or newer with npm for `npm test` and `node scripts/demo.mjs`
+- Node.js 24 or newer with npm for `npm test` and `node scripts/demo.mjs`
 - A shell with `curl.exe` available on Windows
 
 ## Start the application
